@@ -49,12 +49,12 @@ const FeedView: React.FC<FeedViewProps> = ({ isAdmin }) => {
 
   return (
     <div className="h-full flex flex-col p-4 md:p-8 overflow-y-auto">
-      <div className="flex justify-between items-center mb-8 border-b border-[#ff9900] pb-2">
+      <div className="flex justify-between items-center mb-8 border-b theme-border pb-2">
         <h2 className="text-3xl font-teko tracking-widest text-glow">SECTOR ANNOUNCEMENTS</h2>
         {isAdmin && (
           <button 
             onClick={() => setIsPosting(!isPosting)}
-            className="flex items-center gap-2 text-xs border border-[#ff9900] px-3 py-1 hover:bg-[#ff9900] hover:text-black transition-colors"
+            className="flex items-center gap-2 text-xs border theme-border px-3 py-1 hover:bg-[var(--theme-color)] hover:text-black transition-colors"
           >
             <PlusSquare size={14} /> {isPosting ? 'CANCEL' : 'NEW ENTRY'}
           </button>
@@ -62,21 +62,21 @@ const FeedView: React.FC<FeedViewProps> = ({ isAdmin }) => {
       </div>
 
       {isPosting && (
-        <form onSubmit={handlePost} className="mb-8 bg-[#101010] p-4 border border-[#ff9900] animate-in fade-in slide-in-from-top-4">
+        <form onSubmit={handlePost} className="mb-8 bg-[#101010] p-4 border theme-border animate-in fade-in slide-in-from-top-4">
           <input
             type="text"
             placeholder="SUBJECT HEADER"
-            className="w-full bg-black border-b border-[#333] p-2 text-[#ff9900] outline-none focus:border-[#ff9900] font-bold mb-4 placeholder-gray-700"
+            className="w-full bg-black border-b border-[#333] p-2 theme-text outline-none focus:border-[var(--theme-color)] font-bold mb-4 placeholder-gray-700"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
           />
           <textarea
             placeholder="TRANSMISSION CONTENT..."
-            className="w-full bg-black border border-[#333] p-2 text-[#ff9900] outline-none focus:border-[#ff9900] h-32 placeholder-gray-700 resize-none"
+            className="w-full bg-black border border-[#333] p-2 theme-text outline-none focus:border-[var(--theme-color)] h-32 placeholder-gray-700 resize-none"
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
           />
-          <button type="submit" className="mt-4 w-full bg-[#ff9900] text-black font-bold py-2 hover:bg-white transition-colors">
+          <button type="submit" className="mt-4 w-full theme-bg text-black font-bold py-2 hover:bg-white transition-colors">
             BROADCAST
           </button>
         </form>
@@ -87,7 +87,7 @@ const FeedView: React.FC<FeedViewProps> = ({ isAdmin }) => {
           <div className="text-center opacity-50 mt-12">-- NO ACTIVE TRANSMISSIONS --</div>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="relative bg-[#0a0a0a] border-l-4 border-[#ff9900] p-6 hover:bg-[#111] transition-colors group">
+            <div key={post.id} className="relative bg-[#0a0a0a] border-l-4 theme-border p-6 hover:bg-[#111] transition-colors group">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-xl font-bold tracking-wider">{post.title}</h3>
                 <div className="flex flex-col items-end text-xs opacity-60 font-mono">
