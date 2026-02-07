@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
-import { Battery, Zap, Activity } from 'lucide-react';
+
+import React, { useState, useEffect } from 'react';
+import { Activity, Signal, Cpu } from 'lucide-react';
 
 const SystemMonitor: React.FC = () => {
-  // Gamified "Vital Signs" for students
-  const [energy, setEnergy] = useState(80); // Caffeine/Sleep
-  const [stress, setStress] = useState(20); // Radiation metaphor
-  const [focus, setFocus] = useState(50);   // Suit Power metaphor
+  // Purely aesthetic system monitoring (no gamification)
+  const [cpu, setCpu] = useState(12);
+  const [net, setNet] = useState(45);
 
-  const adjust = (setter: React.Dispatch<React.SetStateAction<number>>, val: number) => {
-    setter(prev => Math.max(0, Math.min(100, prev + val)));
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCpu(prev => Math.min(100, Math.max(5, prev + (Math.random() * 20 - 10))));
+      setNet(prev => Math.min(100, Math.max(20, prev + (Math.random() * 30 - 15))));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const renderBar = (val: number, colorClass: string) => (
-    <div className="h-1.5 w-full bg-[#111] mt-1 overflow-hidden border border-[#222]">
+  const renderBar = (val: number) => (
+    <div className="h-1 w-full bg-[#111] mt-1 overflow-hidden border border-[#222]">
       <div 
-        className={`h-full ${colorClass} transition-all duration-500`} 
-        style={{ width: `${val}%` }}
+        className="h-full theme-bg transition-all duration-1000" 
+        style={{ width: `${val}%`, opacity: val > 80 ? 1 : 0.6 }}
       ></div>
     </div>
   );
@@ -23,47 +27,27 @@ const SystemMonitor: React.FC = () => {
   return (
     <div className="px-6 py-4 border-t border-[#333] theme-border">
       <h4 className="text-[10px] font-bold tracking-widest opacity-50 mb-3 flex items-center gap-2">
-        <Activity size={10} /> HEV VITAL SIGNS
+        <Activity size={10} /> SYSTEM DIAGNOSTICS
       </h4>
       
-      {/* Energy / Caffeine */}
-      <div className="mb-3 group select-none">
-        <div className="flex justify-between text-[10px] font-mono mb-1 items-center">
-          <span className="flex items-center gap-1"><Battery size={10}/> ENERGY</span>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => adjust(setEnergy, -10)} className="hover:text-red-500 px-1">-</button>
-            <button onClick={() => adjust(setEnergy, 10)} className="hover:text-green-500 px-1">+</button>
-          </div>
+      <div className="mb-2">
+        <div className="flex justify-between text-[9px] font-mono mb-1 items-center opacity-70">
+          <span className="flex items-center gap-1"><Cpu size={10}/> UPLINK CPU</span>
+          <span>{Math.round(cpu)}%</span>
         </div>
-        {renderBar(energy, energy < 30 ? "bg-red-500" : "bg-green-500")}
+        {renderBar(cpu)}
       </div>
 
-      {/* Stress / Radiation */}
-      <div className="mb-3 group select-none">
-        <div className="flex justify-between text-[10px] font-mono mb-1 items-center">
-          <span className="flex items-center gap-1 text-orange-400">STRESS LVL</span>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => adjust(setStress, -10)} className="hover:text-green-500 px-1">-</button>
-            <button onClick={() => adjust(setStress, 10)} className="hover:text-red-500 px-1">+</button>
-          </div>
+      <div>
+        <div className="flex justify-between text-[9px] font-mono mb-1 items-center opacity-70">
+          <span className="flex items-center gap-1"><Signal size={10}/> NET LATENCY</span>
+          <span>{Math.round(net)}ms</span>
         </div>
-        {renderBar(stress, stress > 70 ? "bg-red-500 animate-pulse" : "bg-orange-500")}
-      </div>
-
-      {/* Focus / Suit Power */}
-      <div className="group select-none">
-        <div className="flex justify-between text-[10px] font-mono mb-1 items-center">
-          <span className="flex items-center gap-1 theme-text"><Zap size={10}/> SUIT POWER</span>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => adjust(setFocus, -10)} className="hover:text-red-500 px-1">-</button>
-            <button onClick={() => adjust(setFocus, 10)} className="hover:text-green-500 px-1">+</button>
-          </div>
-        </div>
-        {renderBar(focus, "theme-bg")}
+        {renderBar(net)}
       </div>
       
-      <div className="mt-2 text-[9px] text-gray-600 text-center font-mono">
-        MONITORING BIOLOGICAL CONSTANTS...
+      <div className="mt-2 text-[8px] text-gray-700 text-center font-mono">
+        SERVER CONNECTIVITY: STABLE
       </div>
     </div>
   );

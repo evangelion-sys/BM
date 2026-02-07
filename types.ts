@@ -1,3 +1,4 @@
+
 export enum Sector {
   LICENCE_L1 = 'Licence Year 1',
   LICENCE_L2 = 'Licence Year 2',
@@ -15,7 +16,10 @@ export enum Sector {
   TRAINING = 'Neural Training',
   LOGS = 'Research Audio Logs',
   ABOUT = 'Clearance / About',
-  GUIDE = 'System Manual'
+  GUIDE = 'System Manual',
+  ENTERTAINMENT = 'Break Room / Media',
+  PEER_REVIEW = 'Peer Review System',
+  UTILITIES = 'System Extensions'
 }
 
 export interface Post {
@@ -24,6 +28,7 @@ export interface Post {
   content: string;
   author: string;
   timestamp: number;
+  files?: { name: string; url: string; type: string }[];
 }
 
 export interface ChatMessage {
@@ -103,12 +108,38 @@ export interface TeamMember {
   role: string;
   clearance: string;
   idName: string; // Funny ID
+  iconType: 'KNULL' | 'BUTTERFLY' | 'ATOM' | 'DNA' | 'BOOK';
 }
 
 export const OWNERS: TeamMember[] = [
-  { name: "B. Wadoud", role: "CEO & Administrator", clearance: "LEVEL 5", idName: "The G-Man" },
-  { name: "A. Maria", role: "Ops Director", clearance: "LEVEL 4", idName: "Headcrab Whisperer" },
-  { name: "A. Chaouki", role: "Tech Lead", clearance: "LEVEL 4", idName: "Crowbar Specialist" },
-  { name: "F. Chifaa", role: "Head of Research", clearance: "LEVEL 4", idName: "Xen Biologist" },
-  { name: "K. Hadil", role: "Logistics", clearance: "LEVEL 4", idName: "Vortigaunt Diplomat" }
+  { name: "B. Wadoud", role: "CEO & Administrator", clearance: "LEVEL 5", idName: "The G-Man", iconType: 'KNULL' },
+  { name: "A. Maria", role: "Ops Director", clearance: "LEVEL 4", idName: "Headcrab Whisperer", iconType: 'BUTTERFLY' },
+  { name: "A. Chaouki", role: "Tech Lead", clearance: "LEVEL 4", idName: "Crowbar Specialist", iconType: 'ATOM' },
+  { name: "F. Chifaa", role: "Head of Research", clearance: "LEVEL 4", idName: "Xen Biologist", iconType: 'DNA' },
+  { name: "K. Hadil", role: "Logistics", clearance: "LEVEL 4", idName: "Vortigaunt Diplomat", iconType: 'ATOM' },
+  { name: "S. Manel", role: "Communications", clearance: "LEVEL 4", idName: "Signal Interceptor", iconType: 'BOOK' }
 ];
+
+export interface Assignment {
+  id: string;
+  title: string;
+  description: string;
+  studentName: string;
+  content: string; // Text or Link
+  reviews: Review[];
+  timestamp: number;
+}
+
+export interface Review {
+  reviewerName: string;
+  rating: number; // 1-5
+  comment: string;
+}
+
+export interface AppSettings {
+  theme: 'CYBERPUNK' | 'GIRLY';
+  language: 'EN' | 'FR' | 'AR';
+  fontSize: 'SMALL' | 'NORMAL' | 'LARGE';
+  reduceMotion: boolean;
+  isPwaMode: boolean;
+}

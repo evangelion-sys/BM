@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { subscribeToPath, pushData, removeData } from '../services/firebaseService';
 import { ExamEntry, Sector } from '../types';
-import { Timer, Trash2, Plus, CalendarClock, Filter, ArrowUpDown } from 'lucide-react';
+import { Timer, Trash2, Plus, CalendarClock, Filter, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 const ExamSchedule: React.FC = () => {
   const [exams, setExams] = useState<ExamEntry[]>([]);
@@ -16,8 +17,11 @@ const ExamSchedule: React.FC = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Sort
-  const [sortConfig, setSortConfig] = useState<{key: 'date' | 'module', direction: 'asc' | 'desc'}>({key: 'date', direction: 'asc'});
+  // Sort State
+  const [sortConfig, setSortConfig] = useState<{
+    key: 'date' | 'module' | 'time' | 'room'; 
+    direction: 'asc' | 'desc'
+  }>({key: 'date', direction: 'asc'});
 
   // New Exam Form
   const [date, setDate] = useState('');
@@ -48,11 +52,16 @@ const ExamSchedule: React.FC = () => {
     if(confirm('REMOVE EXAM ENTRY?')) await removeData(dbPath, id);
   };
 
-  const toggleSort = (key: 'date' | 'module') => {
+  const toggleSort = (key: 'date' | 'module' | 'time' | 'room') => {
     setSortConfig(prev => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
+  };
+
+  const renderSortIcon = (key: string) => {
+    if (sortConfig.key !== key) return <ArrowUpDown size={10} className="opacity-50" />;
+    return sortConfig.direction === 'asc' ? <ArrowUp size={10} /> : <ArrowDown size={10} />;
   };
 
   // Filter & Sort Logic
@@ -66,6 +75,7 @@ const ExamSchedule: React.FC = () => {
     let valA = a[sortConfig.key].toLowerCase();
     let valB = b[sortConfig.key].toLowerCase();
     
+    // Custom handling for time if needed, but string comparison works for HH:MM
     if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
     if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
     return 0;
@@ -138,17 +148,21 @@ const ExamSchedule: React.FC = () => {
          </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto border border-[#222]">
         <div className="w-full text-left border-collapse">
-            <div className="grid grid-cols-12 gap-4 border-b border-[#333] pb-2 text-xs font-mono text-gray-500 mb-2 px-2">
+            <div className="grid grid-cols-12 gap-4 bg-[#101010] border-b border-[#333] py-2 px-4 text-[10px] font-mono tracking-widest text-gray-500 sticky top-0 z-10">
                <div className="col-span-2 cursor-pointer hover:text-white flex items-center gap-1" onClick={() => toggleSort('date')}>
-                 DATE {sortConfig.key === 'date' && <ArrowUpDown size={10} />}
+                 DATE {renderSortIcon('date')}
                </div>
-               <div className="col-span-2">TIME</div>
+               <div className="col-span-2 cursor-pointer hover:text-white flex items-center gap-1" onClick={() => toggleSort('time')}>
+                 TIME {renderSortIcon('time')}
+               </div>
                <div className="col-span-4 cursor-pointer hover:text-white flex items-center gap-1" onClick={() => toggleSort('module')}>
-                 MODULE {sortConfig.key === 'module' && <ArrowUpDown size={10} />}
+                 MODULE / SUBJECT {renderSortIcon('module')}
                </div>
-               <div className="col-span-2">LOC</div>
+               <div className="col-span-2 cursor-pointer hover:text-white flex items-center gap-1" onClick={() => toggleSort('room')}>
+                 ROOM {renderSortIcon('room')}
+               </div>
                <div className="col-span-1">SEAT</div>
                <div className="col-span-1"></div>
             </div>
@@ -157,11 +171,13 @@ const ExamSchedule: React.FC = () => {
                 <div className="text-center opacity-40 py-8 font-mono">NO EXAMS FOUND MATCHING PARAMETERS.</div>
             ) : (
                 processedExams.map((ex) => (
-                    <div key={ex.id} className="grid grid-cols-12 gap-4 border-b border-[#222] py-4 px-2 hover:bg-[#111] items-center group">
-                        <div className="col-span-2 font-bold text-[var(--theme-color)]">{ex.date}</div>
-                        <div className="col-span-2 text-gray-400 flex items-center gap-1"><Timer size={12}/> {ex.time}</div>
-                        <div className="col-span-4 font-bold text-white text-lg tracking-wide">{ex.module}</div>
-                        <div className="col-span-2 text-xs font-mono bg-[#222] text-center py-1 rounded">{ex.room}</div>
+                    <div key={ex.id} className="grid grid-cols-12 gap-4 border-b border-[#151515] py-4 px-4 hover:bg-[#111] items-center group transition-colors">
+                        <div className="col-span-2 font-bold text-[var(--theme-color)]">{new Date(ex.date).toLocaleDateString()}</div>
+                        <div className="col-span-2 text-gray-400 flex items-center gap-1 font-mono text-xs"><Timer size={10}/> {ex.time}</div>
+                        <div className="col-span-4 font-bold text-white text-base tracking-wide">{ex.module}</div>
+                        <div className="col-span-2 text-xs font-mono">
+                          <span className="bg-[#222] text-gray-300 px-2 py-1 rounded">{ex.room}</span>
+                        </div>
                         <div className="col-span-1 text-xs text-gray-500">{ex.seat || '-'}</div>
                         <div className="col-span-1 text-right">
                            <button onClick={() => handleDelete(ex.id)} className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-white transition-opacity">

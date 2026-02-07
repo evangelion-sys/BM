@@ -1,41 +1,84 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getDatabase, ref, push, onValue, remove, Database } from 'firebase/database';
 
-// --- CONFIGURATION ---
-// IF YOU ARE A BEGINNER: Ignore this section. The app will work in "Simulation Mode" automatically.
-// IF YOU WANT REAL ONLINE MULTIPLAYER: Paste your Firebase config below.
-const firebaseConfig = {
-  apiKey: "PLACEHOLDER_API_KEY", 
-  authDomain: "placeholder.firebaseapp.com",
-  projectId: "placeholder-id",
-  storageBucket: "placeholder.appspot.com",
-  messagingSenderId: "000000000",
-  appId: "1:0000000:web:0000000",
-  databaseURL: "https://placeholder-id-default-rtdb.firebaseio.com"
+// --- DYNAMIC CONFIGURATION SYSTEM ---
+
+const STORAGE_KEY = 'BM_FIREBASE_CONFIG';
+
+// 1. Try to get config from URL (Share Link)
+const getUrlConfig = () => {
+  try {
+    const hash = window.location.hash;
+    if (hash.includes('uplink=')) {
+      const configStr = hash.split('uplink=')[1];
+      const decoded = atob(configStr); // Base64 decode
+      const config = JSON.parse(decoded);
+      // Save to local storage for persistence
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      // Clean URL
+      window.history.replaceState(null, '', window.location.pathname);
+      return config;
+    }
+  } catch (e) {
+    console.error("Invalid Uplink URL");
+  }
+  return null;
 };
 
+// 2. Try to get config from LocalStorage
+const getStoredConfig = () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return saved ? JSON.parse(saved) : null;
+};
+
+// Initialize
+const config = getUrlConfig() || getStoredConfig();
 let db: Database | null = null;
 let isOfflineMode = true;
 
-// 1. Attempt Connection
-try {
-  if (firebaseConfig.apiKey !== "PLACEHOLDER_API_KEY") {
-    const app = initializeApp(firebaseConfig);
+if (config) {
+  try {
+    // Prevent double initialization
+    const app = !getApps().length ? initializeApp(config) : getApp();
     db = getDatabase(app);
     isOfflineMode = false;
     console.log("%c [SYSTEM] BLACK MESA UPLINK: ONLINE ", "background: #ff9900; color: #000; font-weight: bold;");
-  } else {
-    console.warn("%c [SYSTEM] CONFIG MISSING -> ACTIVATING LOCAL SIMULATION MODE ", "background: #333; color: #ff9900");
+  } catch (e) {
+    console.error("Connection Failed:", e);
+    // If init fails, revert to offline to prevent crash
+    isOfflineMode = true;
   }
-} catch (e) {
-  console.error("Firebase Init Failed:", e);
+} else {
+  console.warn("%c [SYSTEM] NO CONFIG -> SIMULATION MODE ACTIVE ", "background: #333; color: #ff9900");
 }
 
 export const isFirebaseOnline = () => !isOfflineMode;
 
-// --- LOCAL SIMULATION HELPERS ---
-// These functions mimic a real database using your browser's LocalStorage.
-// This allows the app to "work" immediately for testing.
+// --- CONFIG MANAGEMENT TOOLS ---
+
+export const saveConnectionConfig = (jsonString: string) => {
+  try {
+    const parsed = JSON.parse(jsonString);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    window.location.reload(); // Reload to initialize firebase
+  } catch (e) {
+    alert("INVALID CONFIGURATION FORMAT");
+  }
+};
+
+export const resetConnection = () => {
+  localStorage.removeItem(STORAGE_KEY);
+  window.location.reload();
+};
+
+export const generateInviteLink = () => {
+  if (isOfflineMode || !config) return null;
+  const str = JSON.stringify(config);
+  const encoded = btoa(str);
+  return `${window.location.origin}${window.location.pathname}#uplink=${encoded}`;
+};
+
+// --- DATA METHODS (HYBRID) ---
 
 const getLocalData = (path: string) => {
   const key = `BM_DB_${path}`;
@@ -46,14 +89,11 @@ const getLocalData = (path: string) => {
 const setLocalData = (path: string, data: any) => {
   const key = `BM_DB_${path}`;
   localStorage.setItem(key, JSON.stringify(data));
-  // Dispatch event so other components in this tab update
   window.dispatchEvent(new CustomEvent('bm-db-update', { detail: { path } }));
 };
 
-// --- DATA METHODS ---
-
 export const subscribeToPath = (path: string, callback: (data: any[]) => void) => {
-  // A. REAL ONLINE MODE
+  // A. ONLINE
   if (!isOfflineMode && db) {
     const dbRef = ref(db, path);
     return onValue(dbRef, (snapshot) => {
@@ -63,17 +103,15 @@ export const subscribeToPath = (path: string, callback: (data: any[]) => void) =
     });
   }
 
-  // B. LOCAL SIMULATION MODE
-  // We listen to 'bm-db-update' (current tab) and 'storage' (other tabs)
+  // B. OFFLINE SIMULATION
   const notify = () => {
     const data = getLocalData(path);
     const list = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-    // Sort by timestamp if present
     list.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
     callback(list);
   };
 
-  notify(); // Initial load
+  notify();
 
   const handleLocalUpdate = (e: Event) => {
     const customEvent = e as CustomEvent;
@@ -85,7 +123,7 @@ export const subscribeToPath = (path: string, callback: (data: any[]) => void) =
   };
 
   window.addEventListener('bm-db-update', handleLocalUpdate);
-  window.addEventListener('storage', handleStorageUpdate); // Cross-tab sync
+  window.addEventListener('storage', handleStorageUpdate);
 
   return () => {
     window.removeEventListener('bm-db-update', handleLocalUpdate);
@@ -94,35 +132,27 @@ export const subscribeToPath = (path: string, callback: (data: any[]) => void) =
 };
 
 export const pushData = async (path: string, data: any) => {
-  // A. REAL ONLINE MODE
   if (!isOfflineMode && db) {
     const dbRef = ref(db, path);
     await push(dbRef, data);
     return;
   }
 
-  // B. LOCAL SIMULATION MODE
   const current = getLocalData(path);
   const newId = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
   const newItem = { ...data, id: newId };
-  
-  // Artificial delay to feel like a network request
   await new Promise(r => setTimeout(r, 300));
-  
   current[newId] = newItem;
   setLocalData(path, current);
 };
 
 export const removeData = async (path: string, id: string) => {
-  // A. REAL ONLINE MODE
   if (!isOfflineMode && db) {
     const dbRef = ref(db, `${path}/${id}`);
     await remove(dbRef);
     return;
   }
 
-  // B. LOCAL SIMULATION MODE
   const current = getLocalData(path);
   delete current[id];
   setLocalData(path, current);
