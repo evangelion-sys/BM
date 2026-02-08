@@ -6,18 +6,29 @@ export const ADMIN_PASSWORD = "FREEMAN";
 
 export const DEFAULT_POSTS = [
   {
+    id: '2',
+    title: 'SYSTEM UPDATE v2.0',
+    content: 'Repository synchronization complete. New protocols active. \n\nCHANGELOG:\n- Deployment Manifest Updated\n- GitHub Uplink Established\n- Core Data Refreshed',
+    author: 'SYSTEM',
+    timestamp: Date.now()
+  },
+  {
     id: '1',
     title: 'ADMINISTRATOR OVERRIDE',
     content: 'The border world, Xen, is in our control for the time being. Proceed with your research.',
     author: 'G-MAN',
-    timestamp: Date.now()
+    timestamp: Date.now() - 10000000
   }
 ];
 
-// Reorganized Navigation for better UX
+// Reorganized Navigation with Explicit Group Headers
 export const NAV_ITEMS = [
+  // Group 0: Personal
+  { id: 'divider', label: 'IDENTITY_HEADER' },
+  { id: Sector.PROFILE, label: 'STUDENT_PROFILE' },
+
   // Group 1: Academic Levels
-  { id: 'divider', label: 'ACADEMIC_SECTORS' },
+  { id: 'divider', label: 'ACADEMIC_HEADER' },
   { id: Sector.LICENCE_L1, label: 'LICENCE_L1' },
   { id: Sector.LICENCE_L2, label: 'LICENCE_L2' },
   { id: Sector.LICENCE_L3, label: 'LICENCE_L3' },
@@ -25,14 +36,14 @@ export const NAV_ITEMS = [
   { id: Sector.MASTER_S2, label: 'MASTER_S2' },
 
   // Group 2: Student Management Tools
-  { id: 'divider', label: 'MANAGEMENT_TOOLS' },
+  { id: 'divider', label: 'MANAGEMENT_HEADER' },
   { id: Sector.TIMETABLE, label: 'TIMETABLE' },
   { id: Sector.EXAMS, label: 'EXAMS' },
   { id: Sector.CALCULATOR, label: 'CALCULATOR' },
   { id: Sector.PEER_REVIEW, label: 'PEER_REVIEW' },
 
   // Group 3: Research & Resources
-  { id: 'divider', label: 'RESEARCH_DIV' },
+  { id: 'divider', label: 'RESEARCH_HEADER' },
   { id: Sector.LAB, label: 'LAB' },
   { id: Sector.DATA, label: 'DATA' },
   { id: Sector.AI, label: 'AI' },
@@ -40,7 +51,7 @@ export const NAV_ITEMS = [
   { id: Sector.LOGS, label: 'LOGS' },
 
   // Group 4: Facility & Extras
-  { id: 'divider', label: 'FACILITY' },
+  { id: 'divider', label: 'FACILITY_HEADER' },
   { id: Sector.FACULTY, label: 'FACULTY' },
   { id: Sector.ABOUT, label: 'ABOUT' },
   { id: Sector.ENTERTAINMENT, label: 'ENTERTAINMENT' },
@@ -80,10 +91,15 @@ export const TRANSLATIONS: any = {
     pwa_desc: "Enable Progressive Web App installation features.",
     pwa_toast: "NEW CONTENT AVAILABLE: APP IS READY TO INSTALL.",
     language: "LANGUAGE",
-    ACADEMIC_SECTORS: "// ACADEMIC SECTORS",
-    MANAGEMENT_TOOLS: "// MANAGEMENT TOOLS",
-    RESEARCH_DIV: "// RESEARCH DIV",
-    FACILITY: "// FACILITY",
+    
+    // Headers
+    IDENTITY_HEADER: "IDENTITY & ACCESS",
+    ACADEMIC_HEADER: "ACADEMIC SECTORS",
+    MANAGEMENT_HEADER: "MANAGEMENT TOOLS",
+    RESEARCH_HEADER: "RESEARCH DIVISIONS",
+    FACILITY_HEADER: "FACILITY SECTIONS",
+
+    STUDENT_PROFILE: 'ID CARD & PROFILE',
     LICENCE_L1: 'LICENCE 1',
     LICENCE_L2: 'LICENCE 2',
     LICENCE_L3: 'LICENCE 3',
@@ -117,10 +133,14 @@ export const TRANSLATIONS: any = {
     pwa_desc: "Activer les fonctionnalités d'installation PWA.",
     pwa_toast: "NOUVEAU CONTENU : L'APPLICATION EST PRÊTE À ÊTRE INSTALLÉE.",
     language: "LANGUE",
-    ACADEMIC_SECTORS: "// SECTEURS ACADÉMIQUES",
-    MANAGEMENT_TOOLS: "// OUTILS DE GESTION",
-    RESEARCH_DIV: "// DIV RECHERCHE",
-    FACILITY: "// INSTALLATION",
+    
+    IDENTITY_HEADER: "IDENTITÉ ET ACCÈS",
+    ACADEMIC_HEADER: "SECTEURS ACADÉMIQUES",
+    MANAGEMENT_HEADER: "OUTILS DE GESTION",
+    RESEARCH_HEADER: "DIVISIONS DE RECHERCHE",
+    FACILITY_HEADER: "SECTIONS DU SITE",
+
+    STUDENT_PROFILE: 'CARTE ID & PROFIL',
     LICENCE_L1: 'LICENCE 1',
     LICENCE_L2: 'LICENCE 2',
     LICENCE_L3: 'LICENCE 3',
@@ -154,10 +174,14 @@ export const TRANSLATIONS: any = {
     pwa_desc: "تفعيل ميزات تثبيت تطبيق الويب التقدمي.",
     pwa_toast: "محتوى جديد: التطبيق جاهز للتثبيت.",
     language: "لغة",
-    ACADEMIC_SECTORS: "// القطاعات الأكاديمية",
-    MANAGEMENT_TOOLS: "// أدوات الإدارة",
-    RESEARCH_DIV: "// قسم البحث",
-    FACILITY: "// المنشأة",
+    
+    IDENTITY_HEADER: "الهوية والوصول",
+    ACADEMIC_HEADER: "القطاعات الأكاديمية",
+    MANAGEMENT_HEADER: "أدوات الإدارة",
+    RESEARCH_HEADER: "أقسام البحث",
+    FACILITY_HEADER: "مرافق المنشأة",
+
+    STUDENT_PROFILE: 'بطاقة الهوية',
     LICENCE_L1: 'ليسانس 1',
     LICENCE_L2: 'ليسانس 2',
     LICENCE_L3: 'ليسانس 3',

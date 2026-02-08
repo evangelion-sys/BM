@@ -3,26 +3,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Black Mesa" />
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <title>Black Mesa Uplink</title>
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/168/168735.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Teko:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Teko:wght@300;400;500;600;700&family=Inter:wght@300;400;600&family=VT323&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
         --theme-color: #ff9900;
         --theme-dim: rgba(255, 153, 0, 0.1);
         --theme-glass: rgba(20, 20, 20, 0.8);
+        --font-main: 'Rajdhani', sans-serif;
       }
 
       body {
-        background-color: #050505;
+        background-color: var(--bg-color, #050505);
         color: var(--theme-color);
-        font-family: 'Share Tech Mono', monospace;
+        font-family: var(--font-main);
         overflow: hidden;
-        transition: color 1s ease;
+        transition: color 0.5s ease, background-color 0.5s ease;
+        /* Prevent bounce scroll on iOS */
+        overscroll-behavior-y: none;
       }
       .font-teko {
         font-family: 'Teko', sans-serif;
@@ -97,34 +108,71 @@
         fill: var(--theme-color);
       }
 
-      /* Animations */
-      @keyframes portal-spin {
-        0% { transform: scale(0) rotate(0deg); opacity: 0; }
-        20% { opacity: 1; }
-        100% { transform: scale(50) rotate(180deg); opacity: 0; }
-      }
-      @keyframes void-flash {
-        0% { background-color: transparent; }
-        50% { background-color: var(--theme-color); }
-        100% { background-color: #000; }
-      }
-      @keyframes shake {
-        0% { transform: translate(1px, 1px) rotate(0deg); }
-        10% { transform: translate(-1px, -2px) rotate(-1deg); }
-        20% { transform: translate(-3px, 0px) rotate(1deg); }
-        30% { transform: translate(3px, 2px) rotate(0deg); }
-        40% { transform: translate(1px, -1px) rotate(1deg); }
-        50% { transform: translate(-1px, 2px) rotate(-1deg); }
-        60% { transform: translate(-3px, 1px) rotate(0deg); }
-        70% { transform: translate(3px, 1px) rotate(-1deg); }
-        80% { transform: translate(-1px, -1px) rotate(1deg); }
-        90% { transform: translate(1px, 2px) rotate(0deg); }
-        100% { transform: translate(1px, -2px) rotate(-1deg); }
+      /* --- ADVANCED ANIMATIONS --- */
+
+      /* Glitch Effect */
+      @keyframes glitch-skew {
+        0% { transform: skew(0deg); }
+        20% { transform: skew(-10deg); filter: blur(2px); }
+        40% { transform: skew(10deg); filter: blur(1px); }
+        60% { transform: skew(-5deg); }
+        80% { transform: skew(5deg); }
+        100% { transform: skew(0deg); }
       }
 
-      .portal-active { animation: portal-spin 2s cubic-bezier(0.5, 0, 0.2, 1) forwards; }
-      .void-flash-active { animation: void-flash 2s ease-out forwards; }
-      .shake-active { animation: shake 0.5s infinite; }
+      /* The Singularity Entry */
+      @keyframes hyperspace-tunnel {
+        0% {
+          transform: scale(1) rotate(0deg);
+          filter: brightness(1) contrast(1);
+          opacity: 1;
+        }
+        40% {
+          transform: scale(0.8) rotate(-5deg);
+          filter: brightness(2) contrast(1.5) hue-rotate(90deg);
+        }
+        50% {
+           transform: scale(0.1) rotate(180deg);
+           filter: brightness(50) contrast(2);
+           opacity: 1;
+        }
+        100% {
+          transform: scale(30) rotate(0deg);
+          filter: brightness(100) contrast(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes chromatic-aberration {
+        0% { text-shadow: none; }
+        20% { text-shadow: 2px 0 red, -2px 0 blue; }
+        40% { text-shadow: -2px 0 red, 2px 0 blue; }
+        60% { text-shadow: 2px 0 red, -2px 0 blue; }
+        100% { text-shadow: none; }
+      }
+      
+      @keyframes whiteout {
+        0% { background-color: transparent; }
+        100% { background-color: white; }
+      }
+
+      /* Utility Classes for Animation */
+      .breach-active {
+        animation: hyperspace-tunnel 2.5s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+      }
+      
+      .whiteout-active {
+        animation: whiteout 2s ease-in forwards;
+      }
+
+      .glitch-text {
+        animation: chromatic-aberration 0.2s infinite;
+      }
+      
+      .shake-active {
+        animation: glitch-skew 0.5s infinite;
+      }
+
     </style>
   <script type="importmap">
 {
@@ -146,5 +194,23 @@
     <div id="root"></div>
     <div class="scanlines"></div>
     <script type="module" src="./index.tsx"></script>
+    <script>
+      // Robust Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          try {
+            navigator.serviceWorker.register('./sw.js')
+              .then(function(registration) {
+                console.log('[System] SW Active:', registration.scope);
+              })
+              .catch(function(err) {
+                console.log('[System] SW Registration Skipped:', err);
+              });
+          } catch (e) {
+            console.warn('[System] SW Registration Failed (Env Restriction)');
+          }
+        });
+      }
+    </script>
   </body>
 </html>

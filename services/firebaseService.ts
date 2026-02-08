@@ -1,3 +1,4 @@
+
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getDatabase, ref, push, onValue, remove, Database } from 'firebase/database';
 
@@ -9,18 +10,20 @@ const STORAGE_KEY = 'BM_FIREBASE_CONFIG';
 const getUrlConfig = () => {
   try {
     const hash = window.location.hash;
-    if (hash.includes('uplink=')) {
+    if (hash && hash.includes('uplink=')) {
       const configStr = hash.split('uplink=')[1];
-      const decoded = atob(configStr); // Base64 decode
-      const config = JSON.parse(decoded);
-      // Save to local storage for persistence
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-      // Clean URL
-      window.history.replaceState(null, '', window.location.pathname);
-      return config;
+      if (configStr) {
+        const decoded = atob(configStr); // Base64 decode
+        const config = JSON.parse(decoded);
+        // Save to local storage for persistence
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        // Clean URL - removing the hash so it looks clean
+        window.history.replaceState(null, '', window.location.pathname);
+        return config;
+      }
     }
   } catch (e) {
-    console.error("Invalid Uplink URL");
+    console.warn("Invalid Uplink URL Format");
   }
   return null;
 };
@@ -42,14 +45,15 @@ if (config) {
     const app = !getApps().length ? initializeApp(config) : getApp();
     db = getDatabase(app);
     isOfflineMode = false;
-    console.log("%c [SYSTEM] BLACK MESA UPLINK: ONLINE ", "background: #ff9900; color: #000; font-weight: bold;");
+    console.log("%c [SYSTEM] ONLINE - UPLINK ESTABLISHED ", "color: #ff9900; font-weight: bold;");
   } catch (e) {
     console.error("Connection Failed:", e);
     // If init fails, revert to offline to prevent crash
     isOfflineMode = true;
   }
 } else {
-  console.warn("%c [SYSTEM] NO CONFIG -> SIMULATION MODE ACTIVE ", "background: #333; color: #ff9900");
+  // Use a softer log message for simulation mode
+  console.log("%c [SYSTEM] SIMULATION MODE ACTIVE (Local Only) ", "color: #888;");
 }
 
 export const isFirebaseOnline = () => !isOfflineMode;
@@ -73,9 +77,27 @@ export const resetConnection = () => {
 
 export const generateInviteLink = () => {
   if (isOfflineMode || !config) return null;
-  const str = JSON.stringify(config);
-  const encoded = btoa(str);
-  return `${window.location.origin}${window.location.pathname}#uplink=${encoded}`;
+  try {
+    const str = JSON.stringify(config);
+    const encoded = btoa(str);
+    
+    // Dynamic Base URL Construction
+    // This fixes issues where the link would point to the wrong Vercel/Netlify instance
+    let baseUrl = window.location.origin + window.location.pathname;
+    
+    // Cleanup trailing slashes or index.html
+    if (baseUrl.endsWith('index.html')) {
+        baseUrl = baseUrl.replace('index.html', '');
+    }
+    if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.slice(0, -1);
+    }
+    
+    return `${baseUrl}/#uplink=${encoded}`;
+  } catch (e) {
+    console.error("Error generating link", e);
+    return null;
+  }
 };
 
 // --- DATA METHODS (HYBRID) ---

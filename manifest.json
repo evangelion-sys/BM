@@ -1,0 +1,26 @@
+
+{
+  "name": "Black Mesa Uplink",
+  "short_name": "Black Mesa",
+  "description": "Collaborative academic research platform with secure uplink capabilities.",
+  "id": "/",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#ff9900",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/168/168735.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/168/168735.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

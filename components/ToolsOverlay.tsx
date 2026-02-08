@@ -3,7 +3,11 @@ import React, { useState } from 'react';
 import { Book, Search, HardDrive, Send, X, ExternalLink, Upload, File, Wrench } from 'lucide-react';
 import { DICTIONARY_DATA } from '../constants';
 
-export const ToolsOverlay: React.FC = () => {
+interface ToolsOverlayProps {
+  onOpenTool: (toolId: string) => void;
+}
+
+export const ToolsOverlay: React.FC<ToolsOverlayProps> = ({ onOpenTool }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<string>('DICT');
   
@@ -16,19 +20,9 @@ export const ToolsOverlay: React.FC = () => {
     setDef(d || "TERM NOT FOUND IN LOCAL DATABASE. TRY GOOGLE SCHOLAR.");
   };
 
-  // Saved Files (Mock Drive)
-  const [savedFiles, setSavedFiles] = useState<string[]>(() => {
-    const saved = localStorage.getItem('BM_LOCAL_DRIVE');
-    return saved ? JSON.parse(saved) : ['Lecture_Notes_L1.pdf', 'Project_Alpha_Backup.zip'];
-  });
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const fileName = e.target.files[0].name;
-      const newFiles = [...savedFiles, fileName];
-      setSavedFiles(newFiles);
-      localStorage.setItem('BM_LOCAL_DRIVE', JSON.stringify(newFiles));
-    }
+  const handleExternalTool = (toolId: string) => {
+    onOpenTool(toolId);
+    setIsOpen(false); // Close overlay so user sees the split view
   };
 
   if (!isOpen) {
@@ -64,7 +58,7 @@ export const ToolsOverlay: React.FC = () => {
           <div className="bg-black/90 p-3 border-b border-[#333] flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Wrench size={16} className="theme-text" />
-              <span className="text-sm font-teko tracking-widest text-white">FIELD KIT v4.0</span>
+              <span className="text-sm font-teko tracking-widest text-white">FIELD KIT v4.1</span>
             </div>
             <div className="flex gap-1">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
@@ -132,35 +126,39 @@ export const ToolsOverlay: React.FC = () => {
              )}
 
              {activeTool === 'DRIVE' && (
-               <div className="relative z-10 flex flex-col h-full">
-                 <h4 className="text-xs font-bold mb-3 theme-text border-b border-gray-800 pb-1">LOCAL STORAGE</h4>
-                 <ul className="space-y-1 overflow-y-auto flex-1 mb-3 border border-[#222] bg-[#080808] p-1">
-                   {savedFiles.map((f, i) => (
-                     <li key={i} className="flex justify-between items-center text-xs text-gray-300 bg-[#111] p-2 hover:bg-[#222] cursor-pointer group border-b border-black">
-                       <span className="flex items-center gap-2 truncate"><File size={12} className="theme-text"/> {f}</span>
-                       <HardDrive size={10} className="text-gray-600"/>
-                     </li>
-                   ))}
-                 </ul>
-                 <label className="cursor-pointer w-full border border-dashed border-gray-600 p-3 text-xs text-gray-400 hover:text-white hover:border-[var(--theme-color)] flex items-center justify-center gap-2 transition-colors bg-[#111]">
-                   <Upload size={14} /> UPLOAD TO CACHE
-                   <input type="file" className="hidden" onChange={handleFileUpload} />
-                 </label>
+               <div className="relative z-10 flex flex-col h-full justify-between">
+                 <div>
+                    <h4 className="text-xs font-bold mb-3 theme-text border-b border-gray-800 pb-1">DRIVE ACCESS</h4>
+                    <p className="text-[10px] text-gray-400 mb-4 leading-relaxed">
+                        MOUNT GOOGLE DRIVE TO SPLIT-VIEW FOR FILE MANAGEMENT.
+                    </p>
+                 </div>
+                 <button 
+                    onClick={() => handleExternalTool('TOOL_DRIVE')}
+                    className="w-full theme-bg text-black font-bold py-3 px-4 flex items-center justify-center gap-2 hover:bg-white transition-colors"
+                  >
+                    <HardDrive size={16} /> MOUNT DRIVE
+                  </button>
                </div>
              )}
 
              {activeTool === 'TG' && (
-               <div className="relative z-10 text-center pt-6">
-                 <div className="w-16 h-16 border-2 border-blue-500/50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)] bg-blue-900/10">
-                   <Send size={32} className="ml-[-2px] mt-[2px]" />
+               <div className="relative z-10 text-center pt-6 flex flex-col h-full justify-between">
+                 <div>
+                    <div className="w-16 h-16 border-2 border-blue-500/50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)] bg-blue-900/10">
+                    <Send size={32} className="ml-[-2px] mt-[2px]" />
+                    </div>
+                    <h4 className="text-sm font-bold mb-2 text-white">SECURE COMMS</h4>
+                    <p className="text-[10px] text-gray-500 mb-6 px-4 font-mono leading-tight">
+                    OPEN TELEGRAM ENCRYPTED MESSAGING IN SPLIT-VIEW PANEL.
+                    </p>
                  </div>
-                 <h4 className="text-sm font-bold mb-2 text-white">SECURE UPLINK</h4>
-                 <p className="text-[10px] text-gray-500 mb-6 px-4 font-mono leading-tight">
-                   TRANSFER CURRENT SESSION DATA TO EXTERNAL TELEGRAM CLIENT FOR MOBILE ANALYSIS.
-                 </p>
-                 <a href="https://t.me/share/url?url=https://black-mesa-uplink.vercel.app&text=Check%20this%20research%20data" target="_blank" rel="noopener noreferrer" className="block text-center theme-bg text-black font-bold py-3 rounded mx-4 hover:brightness-110">
-                   OPEN TELEGRAM CLIENT
-                 </a>
+                 <button 
+                   onClick={() => handleExternalTool('TOOL_TELEGRAM')}
+                   className="w-full bg-blue-600 text-white font-bold py-3 px-4 flex items-center justify-center gap-2 hover:bg-blue-500 transition-colors rounded-sm"
+                 >
+                   <Send size={16} /> LAUNCH TELEGRAM
+                 </button>
                </div>
              )}
           </div>

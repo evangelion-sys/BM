@@ -1,5 +1,6 @@
 
 export enum Sector {
+  PROFILE = 'Student Profile',
   LICENCE_L1 = 'Licence Year 1',
   LICENCE_L2 = 'Licence Year 2',
   LICENCE_L3 = 'Licence Year 3',
@@ -107,17 +108,16 @@ export interface TeamMember {
   name: string;
   role: string;
   clearance: string;
-  idName: string; // Funny ID
-  iconType: 'KNULL' | 'BUTTERFLY' | 'ATOM' | 'DNA' | 'BOOK';
+  iconType: 'KNULL' | 'CROWN' | 'VIKING' | 'GIRLY_FLOWER' | 'GIRLY_HEART';
 }
 
 export const OWNERS: TeamMember[] = [
-  { name: "B. Wadoud", role: "CEO & Administrator", clearance: "LEVEL 5", idName: "The G-Man", iconType: 'KNULL' },
-  { name: "A. Maria", role: "Ops Director", clearance: "LEVEL 4", idName: "Headcrab Whisperer", iconType: 'BUTTERFLY' },
-  { name: "A. Chaouki", role: "Tech Lead", clearance: "LEVEL 4", idName: "Crowbar Specialist", iconType: 'ATOM' },
-  { name: "F. Chifaa", role: "Head of Research", clearance: "LEVEL 4", idName: "Xen Biologist", iconType: 'DNA' },
-  { name: "K. Hadil", role: "Logistics", clearance: "LEVEL 4", idName: "Vortigaunt Diplomat", iconType: 'ATOM' },
-  { name: "S. Manel", role: "Communications", clearance: "LEVEL 4", idName: "Signal Interceptor", iconType: 'BOOK' }
+  { name: "B. Wadoud", role: "CEO & Administrator", clearance: "LEVEL 5", iconType: 'KNULL' },
+  { name: "A. Maria", role: "Ops Director", clearance: "LEVEL 4", iconType: 'CROWN' },
+  { name: "A. Chaouki", role: "Tech Lead", clearance: "LEVEL 4", iconType: 'VIKING' },
+  { name: "F. Chifaa", role: "Head of Research", clearance: "LEVEL 4", iconType: 'GIRLY_FLOWER' },
+  { name: "K. Hadil", role: "Logistics", clearance: "LEVEL 4", iconType: 'GIRLY_HEART' },
+  { name: "S. Manel", role: "Communications", clearance: "LEVEL 4", iconType: 'GIRLY_FLOWER' }
 ];
 
 export interface Assignment {
